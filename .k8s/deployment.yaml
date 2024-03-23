@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hackathon-api
+  namespace: fiap-hackathon
+spec:
+  selector:
+    matchLabels:
+      app: hackathon-api
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: hackathon-api
+    spec:
+      containers:
+      - name: hackathon-api
+        image: fiap-hackathon/hackathon-api:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+          - name: APP_NAME
+            value: "hackathon"
+          - name: DATABASE_HOST
+            value: "hackathon-db-service"
+          - name: DATABASE_PORT
+            value: "5432"
+          - name: DATABASE_USER
+            value: "admin"
+          - name: DATABASE_PASSWORD
+            value: "secretpassword"
+        livenessProbe:
+          httpGet:
+            path: /healthcheck
+            port: 8080
+          periodSeconds: 15
+          failureThreshold: 3
+          successThreshold: 1
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+        volumeMounts:
+        - name: hackathon-api-volume
+          mountPath: /var/www/volume
+      volumes:
+      - name: hackathon-api-volume
+        persistentVolumeClaim:
+          claimName: hackathon-api-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: fiap-hackathon
+  name: hackathon-db
+  labels:
+    app: hackathon-db
+    tier: postgres
+spec:
+  selector:
+    matchLabels:
+      app: hackathon-db
+      tier: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      namespace: tech-challenge
+      labels:
+        app: hackathon-db
+        tier: postgres
+    spec:
+      containers:
+      - image: postgres:latest
+        name: hackathon-db
+        env:
+        - name: POSTGRES_DB
+          value: "registros"
+        - name: POSTGRES_USER
+          value: "admin"
+        - name: POSTGRES_PASSWORD
+          value: "secretpassword"
+        ports:
+        - containerPort: 5432
+          name: mysql
+        volumeMounts:
+        - name: hackathon-db-volume
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: hackathon-db-volume
+        persistentVolumeClaim:
+          claimName: hackathon-db-pvc
