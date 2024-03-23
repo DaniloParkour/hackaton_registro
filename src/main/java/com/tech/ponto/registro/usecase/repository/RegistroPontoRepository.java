@@ -12,4 +12,6 @@ public interface RegistroPontoRepository extends JpaRepository<RegistroPonto, UU
   public List<RegistroPonto> findByUsuarioId(UUID usuarioId);
 
   public Optional<RegistroPonto> findTopByUsuarioIdOrderByDataHoraDesc(UUID usuarioId);
+
+  public List<RegistroPonto> findByUsuarioIdOrderByDataHoraDesc(UUID usuarioId);
 }
