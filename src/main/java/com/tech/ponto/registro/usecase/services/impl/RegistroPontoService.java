@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,8 +34,17 @@ public class RegistroPontoService implements IRegistroPontoService {
       registroPonto.setUsuario(usuario.get());
       registroPonto.setDataHora(OffsetDateTime.now());
 
-      //Lógica para verificar se é ENTRADA ou SAIDA
       registroPonto.setSituacao(Situacao.ENTRADA);
+
+      Optional<RegistroPonto> ultimoRegistro = repositoryRegistro.findTopByUsuarioIdOrderByDataHoraDesc(idUsuario);
+
+      if(ultimoRegistro.isPresent()) {
+        long diferencaEmHoras = ChronoUnit.HOURS.between(ultimoRegistro.get().getDataHora(), OffsetDateTime.now());
+        if(diferencaEmHoras <= 12 && ultimoRegistro.get().getSituacao().equals(Situacao.ENTRADA)) {
+          registroPonto.setSituacao(Situacao.SAIDA);
+        }
+        System.out.println("Ultimo ponto marcado há " + diferencaEmHoras + " horas.");
+      }
 
       return repositoryRegistro.save(registroPonto);
     }
@@ -42,12 +52,16 @@ public class RegistroPontoService implements IRegistroPontoService {
   }
 
   @Override
-  public RegistroPonto atualizarRegistroDePonto(RegistroPonto registroDePonto, UUID idUsuario) {
-    Optional<Usuario> usuario = repositoryUsuario.findById(idUsuario);
-    if(usuario.isPresent()) {
-      Optional<RegistroPonto> registroPonto = repositoryRegistro.findById(registroDePonto.getId());
-      if(registroPonto.isPresent()) {
-        return repositoryRegistro.save(registroDePonto);
+  public RegistroPonto atualizarRegistroDePonto(RegistroPonto registroDePonto) {
+    Optional<RegistroPonto> registroPontoEncontrado = repositoryRegistro.findById(registroDePonto.getId());
+    if(registroPontoEncontrado.isPresent()) {
+      Optional<Usuario> usuario = repositoryUsuario.findById(registroPontoEncontrado.get().getUsuario().getId());
+      if(usuario.isPresent()) {
+        RegistroPonto registroAtualizado = registroPontoEncontrado.get();
+        registroAtualizado.setSituacao(registroDePonto.getSituacao());
+        registroAtualizado.setDataHora(registroDePonto.getDataHora());
+        registroAtualizado.setDataDeAtualizacao(OffsetDateTime.now());
+        return repositoryRegistro.save(registroAtualizado);
       }
     }
     return null;
@@ -55,8 +69,7 @@ public class RegistroPontoService implements IRegistroPontoService {
 
   @Override
   public List<RegistroPonto> listarRegistroDePontoPorUsuario(UUID idUsuario) {
-
-    return null;
+    return repositoryRegistro.findByUsuarioId(idUsuario);
   }
 
 }
