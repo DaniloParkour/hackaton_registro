@@ -7,6 +7,7 @@ import com.tech.ponto.registro.usecase.repository.RegistroPontoRepository;
 import com.tech.ponto.registro.usecase.repository.UsuarioRepository;
 import com.tech.ponto.registro.usecase.services.IRegistroPontoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -68,7 +69,14 @@ public class RegistroPontoService implements IRegistroPontoService {
   }
 
   @Override
-  public List<RegistroPonto> listarRegistroDePontoPorUsuario(UUID idUsuario) {
+  public List<RegistroPonto> listarRegistroDePontoPorUsuario(UUID idUsuario) throws Exception {
+
+    Optional<Usuario> user = repositoryUsuario.findById(idUsuario);
+
+    if(user.isEmpty() || !SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString().equals(user.get().getMatricula())) {
+      throw new Error("Usuário inisistente ou não permitido");
+    }
+
     return repositoryRegistro.findByUsuarioId(idUsuario);
   }
 

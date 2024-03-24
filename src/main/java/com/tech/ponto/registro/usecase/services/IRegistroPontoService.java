@@ -8,5 +8,5 @@ import java.util.UUID;
 public interface IRegistroPontoService {
   public RegistroPonto criarRegistroDePonto(UUID idUsuario);
   public RegistroPonto atualizarRegistroDePonto(RegistroPonto registroDePonto);
-  public List<RegistroPonto> listarRegistroDePontoPorUsuario(UUID idUsuario);
+  public List<RegistroPonto> listarRegistroDePontoPorUsuario(UUID idUsuario) throws Exception;
 }

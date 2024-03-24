@@ -8,6 +8,7 @@ import com.tech.ponto.registro.infra.mapper.IGenericMapper;
 import com.tech.ponto.registro.usecase.services.IRegistroPontoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public class RegistroPontoController implements IRegistroPontoController {
   }
 
   @Override
-  public ResponseEntity<List<RegistroPontoResponseDTO>> listarRegistroDePontoPorUsuario(UUID idUsuario) {
+  public ResponseEntity<List<RegistroPontoResponseDTO>> listarRegistroDePontoPorUsuario(UUID idUsuario) throws Exception {
     List<RegistroPonto> registroPontoList = service.listarRegistroDePontoPorUsuario(idUsuario);
     return ResponseEntity.ok(mapper.toList(registroPontoList, RegistroPontoResponseDTO.class));
   }
