@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 public class RelatorioRegistroPontoResponseDTO {
   private String nome;
-  private Long matricula;
+  private String matricula;
   private UserRole role;
   private List<ItemListaRelatorioRegistroPontoResponseDTO> listaDeRegistroDePopntos;
 }
