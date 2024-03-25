@@ -73,8 +73,10 @@ public class RegistroPontoService implements IRegistroPontoService {
 
     Optional<Usuario> user = repositoryUsuario.findById(idUsuario);
 
-    if(user.isEmpty() || !SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString().equals(user.get().getMatricula())) {
-      throw new Error("Usuário inisistente ou não permitido");
+    Usuario usuarioAuth = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    if(user.isEmpty() || !usuarioAuth.getMatricula().equals(user.get().getMatricula())) {
+      throw new Error("Usuário inesistente ou não permitido");
     }
 
     return repositoryRegistro.findByUsuarioId(idUsuario);

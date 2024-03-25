@@ -38,8 +38,12 @@ public class RegistroPontoController implements IRegistroPontoController {
   }
 
   @Override
-  public ResponseEntity<List<RegistroPontoResponseDTO>> listarRegistroDePontoPorUsuario(UUID idUsuario) throws Exception {
-    List<RegistroPonto> registroPontoList = service.listarRegistroDePontoPorUsuario(idUsuario);
-    return ResponseEntity.ok(mapper.toList(registroPontoList, RegistroPontoResponseDTO.class));
+  public ResponseEntity<List<RegistroPontoResponseDTO>> listarRegistroDePontoPorUsuario(UUID idUsuario) {
+    try {
+      List<RegistroPonto> registroPontoList = service.listarRegistroDePontoPorUsuario(idUsuario);
+      return ResponseEntity.ok(mapper.toList(registroPontoList, RegistroPontoResponseDTO.class));
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().build();
+    }
   }
 }

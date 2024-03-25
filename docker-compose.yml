@@ -7,7 +7,7 @@ services:
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
       - POSTGRES_DB=registros
     ports:
-      - "5431:5431"
+      - "5432:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
 
@@ -21,11 +21,11 @@ services:
     depends_on:
       - postgres
 
-#  springboot-app:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      - postgres
+  springboot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
